@@ -24,19 +24,24 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// render urls_index page
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
 
+// render urls_new page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// redirect shortURL to longURL page
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
-})
+});
+
+// render urls_show page
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
   //res.render("urls_show", templateVars);
@@ -45,20 +50,24 @@ app.get("/urls/:shortURL", (req, res) => {
   // res.redirect(longURL);
 });
 
+//add new url
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect("/urls/" + shortURL);
 });
 
+//delete url
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
+//update long URL
 app.post("urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.updatedLongURL;
+  let newLongURL = req.body.updatedLongURL;
+  urlDatabase[shortURL] = newLongURL;
   res.redirect("/urls" + shortURL);
 });
 
