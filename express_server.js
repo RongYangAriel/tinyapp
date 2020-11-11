@@ -14,6 +14,19 @@ const urlDatabase = {
 };
 
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -60,7 +73,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //add new url
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString();
+  let shortURL = generateRandomString(6);
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect("/urls/" + shortURL);
 });
@@ -96,13 +109,26 @@ app.get("/register", (req, res) => {
     username: req.cookies.username
   }
   res.render("register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  let user = {
+    id: generateRandomString(8),
+    username: req.body.username,
+    password: req.body.password
+  };
+  users[user.id] = user;
+  console.log(users);
+  res.cookie("user_id", user.id);
+  res.redirect("/urls");
 })
 
-function generateRandomString() {
+function generateRandomString(length) {
   var result           = '';
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var charactersLength = characters.length;
-  for ( var i = 0; i < 6; i++ ) {
+  
+  for ( var i = 0; i < length; i++ ) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
