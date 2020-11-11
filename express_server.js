@@ -43,14 +43,14 @@ app.get("/urls.json", (req, res) => {
 app.get('/urls', (req, res) => {
   console.log(req.cookies);
   let templateVars = { urls: urlDatabase,
-  username: req.cookies.username };
+  user: users[req.cookies["user_id"]] };
   res.render('urls_index', templateVars);
 });
 
 // render urls_new page
 app.get("/urls/new", (req, res) => {
-  let templateVars = {username: req.cookies.username}
-  res.render("urls_new");
+  let templateVars = {user: users[req.cookies["user_id"]]}
+  res.render("urls_new", templateVars);
 });
 
 // redirect shortURL to longURL page
@@ -63,7 +63,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username : req.cookies.username
+    user: users[req.cookies["user_id"]]
   };
   //res.render("urls_show", templateVars);
   const longURL = urlDatabase[req.params.shortURL];
@@ -88,7 +88,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/update", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, 
     longURL: req.body.updatedLongURL,
-    username: req.cookies.username };
+    user: users[req.cookies["user_id"]] };
   //res.render("urls_show", templateVars);
   res.render("urls_show", templateVars);
 });
@@ -99,14 +99,14 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 app.get("/register", (req, res) => {
   console.log('get in register');
   let templateVars = {
-    username: req.cookies.username
+    user: users[req.cookies["user_id"]]
   }
   res.render("register", templateVars);
 });
@@ -114,7 +114,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   let user = {
     id: generateRandomString(8),
-    username: req.body.username,
+    email: req.body.email,
     password: req.body.password
   };
   users[user.id] = user;
