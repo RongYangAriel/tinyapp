@@ -88,6 +88,14 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect("/urls");
+});
+
+app.get("/register", (req, res) => {
+  console.log('get in register');
+  let templateVars = {
+    username: req.cookies.username
+  }
+  res.render("register", templateVars);
 })
 
 function generateRandomString() {
