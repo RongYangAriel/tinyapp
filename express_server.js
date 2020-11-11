@@ -64,12 +64,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 //update long URL
-app.post("urls/:shortURL", (req, res) => {
-  let shortURL = req.params.shortURL;
-  let newLongURL = req.body.updatedLongURL;
-  urlDatabase[shortURL] = newLongURL;
-  res.redirect("/urls" + shortURL);
+app.post("/urls/:shortURL/update", (req, res) => {
+  const templateVars = { shortURL: req.params.shortURL, longURL: req.body.updatedLongURL };
+  //res.render("urls_show", templateVars);
+  res.render("urls_show", templateVars);
 });
+
 
 function generateRandomString() {
   var result           = '';
