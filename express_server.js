@@ -26,7 +26,7 @@ app.get("/urls.json", (req, res) => {
 
 // render urls_index page
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username:res.cookies };
   res.render('urls_index', templateVars);
 });
 
@@ -70,6 +70,10 @@ app.post("/urls/:shortURL/update", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
+  res.redirect("/urls/")
+})
 
 function generateRandomString() {
   var result           = '';
