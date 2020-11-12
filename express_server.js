@@ -103,8 +103,16 @@ app.post("/urls/:shortURL/update", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+  if(emailExist(req.body.email)){
+    let user = users[req.cookie("user_id")];
+    if(user.password === req.body.password){
+      res.redirect("/urls");
+    } else {
+      res.status(403);
+    }
+  } else {
+    res.status(403);
+  }
 });
 
 app.post("/logout", (req, res) => {
