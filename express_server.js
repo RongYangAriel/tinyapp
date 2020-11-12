@@ -84,7 +84,7 @@ app.get("/urls/new", (req, res) => {
  
 });
 
-// redirect shortURL to longURL page
+// redirect shortURL to origin longURL page
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].longURL;
   console.log(`longURL is ${longURL}`);
@@ -203,6 +203,7 @@ app.post("/register", (req, res) => {
   }
 });
 
+// render login page
 app.get("/login", (req, res) => {
   let templateVars = {
     user: users[req.session['user_id']]
@@ -210,6 +211,8 @@ app.get("/login", (req, res) => {
   res.render('login', templateVars);
 });
 
+
+//helper function - generate randome string
 const generateRandomString = (length) => {
   let result           = '';
   let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
