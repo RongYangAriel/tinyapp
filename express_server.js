@@ -130,15 +130,19 @@ app.post("/urls/:shortURL/update", (req, res) => {
   let shortURL = req.params.shortURL;
   let newLongURL = req.body.updatedLongURL;
   let userID = req.cookies["user_id"];
-  urlDatabase[shortURL] = {
-    longURL: newLongURL,
-    userID: userID
-  }
-  const templateVars = { shortURL: shortURL, 
+ 
+  if(shortURL in urlsForUser(userID)){
+    urlDatabase[shortURL] = {
+      longURL: newLongURL,
+      userID: userID
+    }
+    const templateVars = { shortURL: shortURL, 
     longURL: newLongURL,
     user: users.userID};
-  //res.render("urls_show", templateVars);
-  res.render("urls_show", templateVars);
+    //res.render("urls_show", templateVars);
+    res.render("urls_show", templateVars);
+  }
+  
 });
 
 // submit login 
@@ -172,6 +176,7 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
+//submit user register
 app.post("/register", (req, res) => {
   if(req.body.email === '' || req.body.password === ''){
     res.status(400);
