@@ -109,8 +109,9 @@ app.post("/urls/:shortURL/update", (req, res) => {
 app.post("/login", (req, res) => {
   console.log(emailExist(req.body.email));
   if(emailExist(req.body.email)){
-    let user = users.examilExist(req.body.email);
+    let user = users[emailExist(req.body.email)];
     if(user.password === req.body.password){
+      res.cookie("user_id", user.id);
       res.redirect("/urls");
     } else {
       res.status(403);
