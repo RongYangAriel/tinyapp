@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 var cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const getUserByEmail = require('../helpers');
+const getUserByEmail = require('./helpers');
 
 
 app.set('view engine', 'ejs');
