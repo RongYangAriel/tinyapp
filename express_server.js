@@ -27,10 +27,11 @@ const users = {
   }
 }
 
+// this function has issue
 const emailExist = (email) => {
   for (let user in users) {
     if (user.email === email){
-      return true
+      return user
     }
   }
   return false;
@@ -50,7 +51,7 @@ app.get("/urls.json", (req, res) => {
 
 // render urls_index page
 app.get('/urls', (req, res) => {
-  console.log(req.cookies);
+  console.log('moving to urls', req.cookies);
   let templateVars = { urls: urlDatabase,
   user: users[req.cookies["user_id"]] };
   res.render('urls_index', templateVars);
@@ -102,16 +103,20 @@ app.post("/urls/:shortURL/update", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// submit login 
 app.post("/login", (req, res) => {
+  console.log(emailExist(req.body.email));
   if(emailExist(req.body.email)){
-    let user = users[req.cookie("user_id")];
+    let user = examilExist(req.body.email);
     if(user.password === req.body.password){
       res.redirect("/urls");
     } else {
       res.status(403);
+      res.send("Password is wrong!")
     }
   } else {
     res.status(403);
+    res.send("Email doesn't exist")
   }
 });
 
@@ -139,8 +144,13 @@ app.post("/register", (req, res) => {
       password: req.body.password
     };
     users[user.id] = user;
-    console.log(users);
     res.cookie("user_id", user.id);
+    console.log(user.id);
+    console.log(users);
+    console.log(users[user.id]);
+    let cookieID = req.cookies["user_id"];        // why console.log user_id in cookies, doesn't work!
+    console.log(cookieID);
+    console.log(users.cookieID);
     res.redirect("/urls");
   } else {
     res.status(400);
