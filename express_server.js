@@ -30,12 +30,14 @@ const users = {
 // this function has issue
 const emailExist = (email) => {
   for (let user in users) {
-    if (user.email === email){
-      return user
+    if (users[user].email === email){
+      return users[user].id
     }
   }
   return false;
 }
+
+console.log(emailExist("user2@example.com"));
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -107,7 +109,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
 app.post("/login", (req, res) => {
   console.log(emailExist(req.body.email));
   if(emailExist(req.body.email)){
-    let user = examilExist(req.body.email);
+    let user = users.examilExist(req.body.email);
     if(user.password === req.body.password){
       res.redirect("/urls");
     } else {
@@ -137,7 +139,10 @@ app.post("/register", (req, res) => {
   if(req.body.email === '' || req.body.password === ''){
     res.status(400);
     res.send('email or password is empty!')
-  } else if(!emailExist(req.body.email)){
+  } else if(emailExist(req.body.email)){
+    res.status(400);
+    res.send("Email is taken! Try again!")
+  } else {
     let user = {
       id: generateRandomString(8),
       email: req.body.email,
@@ -145,16 +150,8 @@ app.post("/register", (req, res) => {
     };
     users[user.id] = user;
     res.cookie("user_id", user.id);
-    console.log(user.id);
     console.log(users);
-    console.log(users[user.id]);
-    let cookieID = req.cookies["user_id"];        // why console.log user_id in cookies, doesn't work!
-    console.log(cookieID);
-    console.log(users.cookieID);
     res.redirect("/urls");
-  } else {
-    res.status(400);
-    res.send("Email is taken! Try again!")
   }
 });
 
