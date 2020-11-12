@@ -35,9 +35,9 @@ const users = {
 }
 
 // this function has issue
-const emailExist = (email) => {
-  for (let user in users) {
-    if (users[user].email === email){
+const getUserByEmail = (email, database) => {
+  for (let user in database) {
+    if (database[user].email === email){
       return users[user].id
     }
   }
@@ -161,9 +161,9 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 // submit login 
 app.post("/login", (req, res) => {
-  console.log(emailExist(req.body.email));
-  if(emailExist(req.body.email)){
-    let user = users[emailExist(req.body.email)];
+  console.log(getUserByEmail(req.body.email, users));
+  if(getUserByEmail(req.body.email, users)){
+    let user = users[getUserByEmail(req.body.email, users)];
     console.log(user);
     if(bcrypt.compareSync(req.body.password, user.password)){
       req.session["user_id"] = user.id;
@@ -196,7 +196,7 @@ app.post("/register", (req, res) => {
   if(req.body.email === '' || req.body.password === ''){
     res.status(400);
     res.send('email or password is empty!')
-  } else if(emailExist(req.body.email)){
+  } else if(getUserByEmail(req.body.email, users)){
     res.status(400);
     res.send("Email is taken! Try again!")
   } else {
