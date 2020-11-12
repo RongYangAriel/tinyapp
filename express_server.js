@@ -138,7 +138,13 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.send("Email is taken! Try again!")
   }
-  
+});
+
+app.get("/login", (req, res) => {
+  let templateVars = {
+    user: users[req.cookies['user_id']]
+  };
+  res.render('login', templateVars);
 })
 
 function generateRandomString(length) {
