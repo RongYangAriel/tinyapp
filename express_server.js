@@ -5,8 +5,12 @@ const bodyParser = require("body-parser");
 var cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const getUserByEmail = require('../helpers');
+
+
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
+
 app.use(cookieSession({
   name: 'session',
   keys: ["abcd"],
@@ -32,16 +36,6 @@ const users = {
     email: "user2@example.com", 
     password: "dishwasher-funk"
   }
-}
-
-// this function has issue
-const getUserByEmail = (email, database) => {
-  for (let user in database) {
-    if (database[user].email === email){
-      return users[user].id
-    }
-  }
-  return false;
 }
 
 const urlsForUser = (id) => {
