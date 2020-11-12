@@ -14,6 +14,31 @@ const urlDatabase = {
 };
 
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+// this function has issue
+const emailExist = (email) => {
+  for (let user in users) {
+    if (users[user].email === email){
+      return users[user].id
+    }
+  }
+  return false;
+}
+
+console.log(emailExist("user2@example.com"));
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -28,16 +53,16 @@ app.get("/urls.json", (req, res) => {
 
 // render urls_index page
 app.get('/urls', (req, res) => {
-  console.log(req.cookies);
+  console.log('moving to urls', req.cookies);
   let templateVars = { urls: urlDatabase,
-  username: req.cookies.username };
+  user: users[req.cookies["user_id"]] };
   res.render('urls_index', templateVars);
 });
 
 // render urls_new page
 app.get("/urls/new", (req, res) => {
-  let templateVars = {username: req.cookies.username}
-  res.render("urls_new");
+  let templateVars = {user: users[req.cookies["user_id"]]}
+  res.render("urls_new", templateVars);
 });
 
 // redirect shortURL to longURL page
@@ -50,7 +75,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username : req.cookies.username
+    user: users[req.cookies["user_id"]]
   };
   //res.render("urls_show", templateVars);
   const longURL = urlDatabase[req.params.shortURL];
@@ -60,7 +85,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //add new url
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString();
+  let shortURL = generateRandomString(6);
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect("/urls/" + shortURL);
 });
@@ -75,27 +100,77 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL/update", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, 
     longURL: req.body.updatedLongURL,
-    username: req.cookies.username };
+    user: users[req.cookies["user_id"]] };
   //res.render("urls_show", templateVars);
   res.render("urls_show", templateVars);
 });
 
+// submit login 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+  console.log(emailExist(req.body.email));
+  if(emailExist(req.body.email)){
+    let user = users[emailExist(req.body.email)];
+    if(user.password === req.body.password){
+      res.cookie("user_id", user.id);
+      res.redirect("/urls");
+    } else {
+      res.status(403);
+      res.send("Password is wrong!")
+    }
+  } else {
+    res.status(403);
+    res.send("Email doesn't exist")
+  }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
+});
+
+app.get("/register", (req, res) => {
+  console.log('get in register');
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  }
+  res.render("register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  if(req.body.email === '' || req.body.password === ''){
+    res.status(400);
+    res.send('email or password is empty!')
+  } else if(emailExist(req.body.email)){
+    res.status(400);
+    res.send("Email is taken! Try again!")
+  } else {
+    let user = {
+      id: generateRandomString(8),
+      email: req.body.email,
+      password: req.body.password
+    };
+    users[user.id] = user;
+    res.cookie("user_id", user.id);
+    console.log(users);
+    res.redirect("/urls");
+  }
+});
+
+app.get("/login", (req, res) => {
+  let templateVars = {
+    user: users[req.cookies['user_id']]
+  };
+  res.render('login', templateVars);
 })
 
-function generateRandomString() {
+function generateRandomString(length) {
   var result           = '';
   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var charactersLength = characters.length;
-  for ( var i = 0; i < 6; i++ ) {
+  
+  for ( var i = 0; i < length; i++ ) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 }
+
