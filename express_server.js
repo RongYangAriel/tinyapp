@@ -27,6 +27,15 @@ const users = {
   }
 }
 
+const emailExist = (email) => {
+  for (let user in users) {
+    if (user.email === email){
+      return true
+    }
+  }
+  return false;
+}
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -112,15 +121,24 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  let user = {
-    id: generateRandomString(8),
-    email: req.body.email,
-    password: req.body.password
-  };
-  users[user.id] = user;
-  console.log(users);
-  res.cookie("user_id", user.id);
-  res.redirect("/urls");
+  if(req.body.email === '' || req.body.password === ''){
+    res.status(400);
+    res.send('email or password is empty!')
+  } else if(!emailExist(req.body.email)){
+    let user = {
+      id: generateRandomString(8),
+      email: req.body.email,
+      password: req.body.password
+    };
+    users[user.id] = user;
+    console.log(users);
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  } else {
+    res.status(400);
+    res.send("Email is taken! Try again!")
+  }
+  
 })
 
 function generateRandomString(length) {
@@ -133,3 +151,4 @@ function generateRandomString(length) {
   }
   return result;
 }
+
