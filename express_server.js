@@ -100,7 +100,7 @@ app.get("/urls/:shortURL", (req, res) => {
   if(shortURL in urlsForUser(userID)){
     const templateVars = { shortURL: shortURL, 
       longURL: urlDatabase[shortURL].longURL,
-      user: userID};
+      user: users[userID]};
     //res.render("urls_show", templateVars);
     res.render("urls_show", templateVars);
     // res.redirect(longURL);

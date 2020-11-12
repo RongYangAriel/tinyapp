@@ -15,7 +15,7 @@
         <a href="/register" class="btn btn-info" role="button">Register</a>
         <a href="/login" class="btn btn-info" role="button">Login</a>
      <% } else { %>
-         <form action="/logout" method="POST">Logged in as <%= user['email'] %>
+         <form action="/logout" method="POST">Logged in as <%= user.email %>
          <button class="btn btn-primary" type="submit" style="margin-left: 1em;">Log out</button>
        </form>
        <%} %>
