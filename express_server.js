@@ -37,7 +37,21 @@ const emailExist = (email) => {
   return false;
 }
 
-console.log(emailExist("user2@example.com"));
+const urlsForUser = (id) => {
+  let userUrls = {};
+  Object.keys(urlDatabase).forEach(key => {
+    if(urlDatabase[key].userID === id) {
+      console.log(urlDatabase[key]);
+      userUrls[key] = {
+        longURL: urlDatabase[key].longURL,
+        userID: id
+      }
+    }
+  })
+  return userUrls
+}
+
+console.log(urlsForUser("aJ48lW"));
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -55,8 +69,9 @@ app.get("/urls.json", (req, res) => {
 app.get('/urls', (req, res) => {
   console.log('moving to urls', req.cookies);
   console.log(urlDatabase);
-  let templateVars = { urls: urlDatabase,
-  user: users[req.cookies["user_id"]] };
+  let userID = req.cookies["user_id"];
+  let templateVars = { urls: urlsForUser(userID),
+  user: users[userID] };
   res.render('urls_index', templateVars);
 });
 
@@ -80,13 +95,18 @@ app.get("/u/:shortURL", (req, res) => {
 
 // render urls_show page
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.cookies["user_id"]]
-  };
-  //res.render("urls_show", templateVars);
-  res.render("urls_show", templateVars);
-  // res.redirect(longURL);
+  let userID = req.cookies["user_id"];
+  let shortURL = req.params.shortURL;
+  if(shortURL in urlsForUser(userID)){
+    const templateVars = { shortURL: shortURL, 
+      longURL: urlDatabase[shortURL].longURL,
+      user: userID};
+    //res.render("urls_show", templateVars);
+    res.render("urls_show", templateVars);
+    // res.redirect(longURL);
+  } else {
+    res.send("Please log in first");
+  }
 });
 
 //add new url
