@@ -121,8 +121,14 @@ app.post("/urls", (req, res) => {
 
 //delete url
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
+  let userID = req.cookies["user_id"];
+  let shortURL = req.params.shortURL;
+  if (shortURL in urlsForUser(userID)){
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  } else {
+    res.status(403);
+  }
 });
 
 //update long URL
@@ -141,8 +147,9 @@ app.post("/urls/:shortURL/update", (req, res) => {
     user: users.userID};
     //res.render("urls_show", templateVars);
     res.render("urls_show", templateVars);
+  } else {
+    res.status(403);
   }
-  
 });
 
 // submit login 
